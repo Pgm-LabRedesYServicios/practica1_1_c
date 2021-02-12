@@ -5,8 +5,10 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
+#include "parser.h"
+
 void usage(char *prog_name) {
-  fprintf(stderr, "Usage:\n %s <address> <port>\n", prog_name);
+  fprintf(stderr, "Usage:\n\t%s <address> <port>\n", prog_name);
 }
 
 int main(int argc, char *argv[]) {
@@ -15,19 +17,19 @@ int main(int argc, char *argv[]) {
   struct sockaddr_in serv_addr, cli_addr;
 
   if (argc == 1) {
-    fprintf(stderr, "Error: Port number not provided\n");
+    fprintf(stderr, "Error: Port number not provided\n\n");
     usage(argv[0]);
     exit(1);
   }
 
   if (argc == 0) {
-    fprintf(stderr, "Error: No arguments provided\n");
+    fprintf(stderr, "Error: No arguments provided\n\n");
     usage(argv[0]);
     exit(1);
   }
 
   if (argc > 2) {
-    fprintf(stderr, "Error: Too many arguments\n");
+    fprintf(stderr, "Error: Too many arguments\n\n");
     usage(argv[0]);
     exit(1);
   }
