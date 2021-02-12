@@ -28,22 +28,16 @@ endif()
 ###############################################################################
 # These instructions search the directory tree when cmake is
 # invoked and put all files that match the pattern in the variables
-set(ping_noc      src/ping_noc.c)
-set(ping_noc_serv src/ping_noc_serv.c)
-set(ping_oc       src/ping_oc_serv.c)
-set(ping_oc_serv  src/ping_noc_serv.c)
 file(GLOB objs    obj/*.o)
-
-set(parser  src/parser.c)
 
 ###############################################################################
 ## target definitions #########################################################
 ###############################################################################
-add_library(practica1 OBJECT ${parser} ${objs})
-add_executable(ping_noc      ${ping_noc}      $<TARGET_OBJECTS:practica1>)
-add_executable(ping_noc_serv ${ping_noc_serv} $<TARGET_OBJECTS:practica1>)
-add_executable(ping_oc       ${ping_oc}       $<TARGET_OBJECTS:practica1>)
-add_executable(ping_oc_serv  ${ping_oc_serv}  $<TARGET_OBJECTS:practica1>)
+add_library(practica1 OBJECT src/parser.c ${objs})
+add_executable(ping_noc      src/ping_noc.c      $<TARGET_OBJECTS:practica1>)
+add_executable(ping_noc_serv src/ping_noc_serv.c $<TARGET_OBJECTS:practica1>)
+add_executable(ping_oc       src/ping_oc.c       $<TARGET_OBJECTS:practica1>)
+add_executable(ping_oc_serv  src/ping_oc_serv.c  $<TARGET_OBJECTS:practica1>)
 
 # This allows to include files relative to the root of the include directory with a <> pair
 target_include_directories(practica1     PUBLIC include)

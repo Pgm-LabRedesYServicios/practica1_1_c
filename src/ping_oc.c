@@ -6,7 +6,7 @@
 #include <sys/types.h>
 
 void usage(char *prog_name) {
-  fprintf(stderr, "Usage:\n %s <address> <port>", prog_name);
+  fprintf(stderr, "Usage:\n %s <address> <port>\n", prog_name);
 }
 
 int main(int argc, char *argv[]) {
@@ -32,5 +32,5 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  return 1;
+  return 0;
 }
