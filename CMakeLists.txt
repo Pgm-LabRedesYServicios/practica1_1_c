@@ -29,11 +29,12 @@ endif()
 # These instructions search the directory tree when cmake is
 # invoked and put all files that match the pattern in the variables
 file(GLOB objs    obj/*.o)
+file(GLOB usages src/usage_*.c)
 
 ###############################################################################
 ## target definitions #########################################################
 ###############################################################################
-add_library(practica1 OBJECT src/parser.c ${objs})
+add_library(practica1 OBJECT src/parser.c ${objs} ${usages})
 add_executable(ping_noc      src/ping_noc.c      $<TARGET_OBJECTS:practica1>)
 add_executable(ping_noc_serv src/ping_noc_serv.c $<TARGET_OBJECTS:practica1>)
 add_executable(ping_oc       src/ping_oc.c       $<TARGET_OBJECTS:practica1>)
