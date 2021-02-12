@@ -7,19 +7,37 @@
 
 #include "parser.h"
 
-int parse_port(char *port_string) {
+void parse_port(struct sockaddr_in *serv_addr, char *port_string) {
   int res;
-  char *invalid_addr;
+  char *invalid_addr = NULL;
 
   errno = 0;
   res = strtol(port_string, &invalid_addr, 10);
   if (errno) {
     err(errno, "Ill-formed port string");
   }
+  if (invalid_addr[0] != '\0') {
+    fprintf(stderr, "Error: Invalid string \"%s\" inside \"%s\"\n", invalid_addr,
+            port_string);
+    exit(1);
+  }
 
-  res = htons(res);
+  if(res > 65535) {
+    fprintf(stderr,
+            "Error: The port %s is too big, the port number should be between 0 and "
+            "65535\n",
+            port_string);
+    exit(1);
+  }
+  if(res < 0) {
+    fprintf(stderr,
+            "Error: The port %s is negative, the port number should be between 0 and "
+            "65535\n",
+            port_string);
+    exit(1);
+  }
 
-  return res;
+  serv_addr->sin_port = htons(res);
 }
 
 void parse_addr(struct sockaddr_in *serv_addr, char *addr) {
