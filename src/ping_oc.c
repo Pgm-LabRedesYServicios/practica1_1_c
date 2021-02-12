@@ -32,11 +32,11 @@ int main(int argc, char *argv[]) {
   errno = 0;
   sock_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (sock_fd == -1) {
-    err(errno, "Error: Failed to create socket\n");
+    err(errno, "Error: Failed to create socket");
   }
 
   if (connect(sock_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-    err(errno, "Error: Failed to connect\n");
+    err(errno, "Error: Failed to connect");
   }
 
   printf("PING %s 56 bytes of data\n", argv[1]);
