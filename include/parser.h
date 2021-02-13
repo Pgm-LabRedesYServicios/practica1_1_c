@@ -15,7 +15,9 @@ void parse_port(struct sockaddr_in *serv_addr, char *port_string);
 
 /**
  * @brief Parses a string into a valid IPv4 address and if it fails,
- * it exits with 1
+ *        it exits with 1
+ *
+ * @desc  It also does domain resolution if it needs to
  *
  * @param addr      The string to be parsed into a sockaddr_in
  * @out   serv_addr The struct to store the result of the parsed

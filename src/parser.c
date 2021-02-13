@@ -1,9 +1,14 @@
 #include <arpa/inet.h>
 #include <err.h>
 #include <errno.h>
+#include <netdb.h>
 #include <netinet/in.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 #include "parser.h"
 
@@ -19,22 +24,24 @@ void parse_port(struct sockaddr_in *serv_addr, char *port_string) {
   }
   // Check if the conversion went well
   if (invalid_addr[0] != '\0') {
-    fprintf(stderr, "Error: Invalid string \"%s\" inside \"%s\"\n", invalid_addr,
-            port_string);
+    fprintf(stderr, "Error: Invalid string \"%s\" inside \"%s\"\n",
+            invalid_addr, port_string);
     exit(1);
   }
 
   // Check if the port is in range
-  if(res > 65535) {
+  if (res > 65535) {
     fprintf(stderr,
-            "Error: The port %s is too big, the port number should be between 0 and "
+            "Error: The port %s is too big, the port number should be between "
+            "0 and "
             "65535\n",
             port_string);
     exit(1);
   }
-  if(res < 0) {
+  if (res < 0) {
     fprintf(stderr,
-            "Error: The port %s is negative, the port number should be between 0 and "
+            "Error: The port %s is negative, the port number should be between "
+            "0 and "
             "65535\n",
             port_string);
     exit(1);
@@ -59,8 +66,22 @@ void parse_addr(struct sockaddr_in *serv_addr, char *addr) {
 
   // The address provided is not valid IPv4
   case 0: {
-    fprintf(stderr, "Error: The address: %s is invalid for IPv4\n", addr);
-    exit(1);
+    struct addrinfo *info, hint = {0};
+    int error;
+
+    hint.ai_family = AF_INET;
+
+    error = getaddrinfo(addr, NULL, &hint, &info);
+    if (error) {
+      err(error,
+          "Error: The argument %s is not a valid IPv4 address or domain name\n",
+          addr);
+    }
+
+    memcpy(&serv_addr->sin_addr, info->ai_addr->sa_data,
+           sizeof(info->ai_addr->sa_data));
+
+    freeaddrinfo(info);
 
     break;
   }
@@ -70,9 +91,12 @@ void parse_addr(struct sockaddr_in *serv_addr, char *addr) {
     err(errno, "This should not happen");
   }
 
-  // Something else happened, this case is not covered in the 2020-06-09 Linux's inet_pton manpage
+  // Something else happened, this case is not covered in the 2020-06-09 Linux's
+  // inet_pton manpage
   default: {
-    fprintf(stderr, "Error: something went wrong when parsing %s to an IPv4 address\n", addr);
+    fprintf(stderr,
+            "Error: something went wrong when parsing %s to an IPv4 address\n",
+            addr);
     exit(1);
   }
   }
