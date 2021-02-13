@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
   buffer[1] = 'I';
   buffer[2] = 'N';
   buffer[3] = 'G';
+  buffer[4] = '\n';
   struct sockaddr_in serv_addr = {0};
 
   usage_client(argc, argv);
