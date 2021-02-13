@@ -35,11 +35,21 @@ int main(int argc, char *argv[]) {
 
   listen(sock_fd, 0);
 
-  while(!(conn = accept(sock_fd, (struct sockaddr*)&clie_addr, NULL))) {
+  printf("Listening on port %s\n", argv[1]);
+
+  errno = 0;
+  while((conn = accept(sock_fd, (struct sockaddr*)&clie_addr, NULL))) {
+    if(errno) {
+      int e = errno;
+      close(sock_fd);
+      err(e, "Error: Failed to accept connection");
+    }
+
     int ret = 1;
     while (ret) {
       // TODO: Implement timeout
       ret = recv(sock_fd, buffer, 512 * sizeof(char), 0);
+      printf("[i] Received %d bytes\n", ret);
       if(ret < 0) {
         close(sock_fd);
         err(errno, "Error: Failed to read from connection");
