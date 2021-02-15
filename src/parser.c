@@ -66,22 +66,17 @@ void parse_addr(struct sockaddr_in *serv_addr, char *addr) {
 
   // The address provided is not valid IPv4
   case 0: {
-    struct addrinfo *info, hint = {0};
+    struct hostent *server;
     int error;
 
-    hint.ai_family = AF_INET;
-
-    error = getaddrinfo(addr, NULL, &hint, &info);
-    if (error) {
-      err(error,
-          "Error: The argument %s is not a valid IPv4 address or domain name\n",
-          addr);
+    server = gethostbyname(addr);
+    if (server == NULL) {
+      err(h_errno, "Error: Failed to find address \"%s\"", addr);
     }
 
-    memcpy(&serv_addr->sin_addr, info->ai_addr->sa_data,
-           sizeof(info->ai_addr->sa_data));
-
-    freeaddrinfo(info);
+    bcopy((char *)server->h_addr_list[0],
+          (char *)&serv_addr->sin_addr.s_addr,
+          sizeof(server->h_length));
 
     break;
   }
