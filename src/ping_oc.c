@@ -44,12 +44,28 @@ int main(int argc, char *argv[]) {
   for (uint8_t i = 1; i < 9; i++) {
     struct timespec t0, t1;
     double elapsed;
+    int bsent, brecv;
 
+    // Get t0 to calculate time delta
+    // NOTE: It is done with the monotonic clock to avoid t1 < t0
     clock_gettime(CLOCK_MONOTONIC, &t0);
 
-    send(sock_fd, buffer, 8, 0);
-    recv(sock_fd, buffer, 512 * sizeof(char), 0);
+    // Send to server and check for errors
+    bsent = send(sock_fd, buffer, 8, 0);
+    if(bsent == -1) {
+      close(sock_fd);
+      err(errno, "Errro while writing to socket");
+    }
 
+    // Received bytes and check for errors
+    brecv = recv(sock_fd, buffer, 512 * sizeof(char), 0);
+    if (brecv == -1) {
+      close(sock_fd);
+      err(errno, "Errro while reading from socket");
+    }
+
+    // Get t1 to calculate time delta and the print it
+    // NOTE: It is done with the monotonic clock to avoid t1 < t0
     clock_gettime(CLOCK_MONOTONIC, &t1);
     if (t1.tv_sec - t0.tv_sec) {
       printf("%d bytes from %s: time=%lds\n", 8, argv[1], t1.tv_sec - t0.tv_sec );

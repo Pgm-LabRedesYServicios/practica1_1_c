@@ -12,7 +12,7 @@
 #include "usage_server.h"
 
 int main(int argc, char *argv[]) {
-  int sock_fd, newsock_fd, port_n, cli_len, chars_read, conn;
+  int sock_fd, newsock_fd, port_n, cli_len, chars_read, conn = 0;
   char buffer[512] = {0};
   struct sockaddr_in serv_addr = {0}, clie_addr = {0};
 
@@ -37,25 +37,45 @@ int main(int argc, char *argv[]) {
 
   printf("Listening on port %s\n", argv[1]);
 
-  errno = 0;
-  while((conn = accept(sock_fd, (struct sockaddr*)&clie_addr, NULL))) {
-    if(errno) {
+  while (conn != -1) {
+    errno = 0;
+    cli_len = sizeof(clie_addr);
+    conn = accept(sock_fd,
+                  (struct sockaddr *)&clie_addr,
+                  (unsigned int *)&cli_len);
+
+    if (conn == -1) {
       int e = errno;
       close(sock_fd);
       err(e, "Error: Failed to accept connection");
     }
+    printf("[i] A client has successfully established a connection\n");
 
-    int ret = 1;
-    while (ret) {
+    while (1) {
+      int brecv, bsent;
+
       // TODO: Implement timeout
-      ret = recv(sock_fd, buffer, 512 * sizeof(char), 0);
-      printf("[i] Received %d bytes\n", ret);
-      if(ret < 0) {
+      brecv = recv(conn, buffer, 512 * sizeof(char), 0);
+      if (brecv < 0) {
+        close(conn);
         close(sock_fd);
         err(errno, "Error: Failed to read from connection");
+      } else {
+        if (brecv == 0) {
+          close(conn);
+          printf("[i] The client has closed the connection\n");
+          break;
+        }
       }
 
-      send(sock_fd, buffer, 8, 0);
+      printf("[i] Received %d bytes\n", brecv);
+
+      bsent = send(conn, buffer, 8, 0);
+      if (bsent == -1) {
+        close(conn);
+        close(sock_fd);
+        err(errno, "Error: Failed to send");
+      }
     }
   }
 
