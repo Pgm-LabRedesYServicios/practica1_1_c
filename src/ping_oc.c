@@ -22,9 +22,9 @@ int main(int argc, char *argv[]) {
   buffer[4] = '\n';
   struct sockaddr_in serv_addr = {0};
 
+  // Check for arguments and print usage if there is a wrong number of
+  // arguments
   usage_client(argc, argv);
-
-  // TODO: Find a way to resolve an url to IPv4 addr
 
   serv_addr.sin_family = AF_INET;
   parse_port(&serv_addr, argv[2]);
